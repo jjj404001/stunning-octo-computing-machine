@@ -5,6 +5,18 @@ Implementation of lz77 encoding algorith.
 #include <stdint.h>
 #include <string.h>
 
+struct LinkedList
+{
+    struct Node
+    {
+        uint64_t Length;
+        uint8_t  Literal; // Byte size literal
+        uint64_t Distance;
+    };
+
+    Node* Head;
+};
+
 void* EncodeLZ77(void* _src, size_t _size)
 {
     /*
@@ -35,18 +47,48 @@ void* EncodeLZ77(void* _src, size_t _size)
     uint8_t* window = (uint8_t*)malloc(window_size);
     uint8_t* view   = (uint8_t*)malloc(view_size);
 
-    uint64_t window_index = 0;
-    uint64_t view_index   = 0;
+    uint64_t src_index    = 0;
+    
+    uint64_t view_start = 0;
+    uint64_t view_end   = 0;
+    uint64_t window_start = 0;
+    uint64_t window_end   = 0;
 
     // Fill view buffer with inputs.
+    {
+        memcpy(view, byte_src, view_size); // Fill lockahead(view) buffer first
+        window[0] = view[0];
+        // First LDD is always be 0,0,view[0]
+        // Maybe have to implement some kind of linked list for LDD.
+        uint64_t curr_size = 1;
+
+
+        while(window_size > curr_size)
+        {
+            
+        }
+    }
+    
+
 
     while(_size > view_size)
     {
-        memcpy(view, &byte_src[view_index], view_size); // use byte_src as view buffer.
+        memcpy(view, &byte_src[src_index], view_size); // use byte_src as view buffer.
 
-        
+        uint64_t view_index   = 0;
+        uint64_t window_index = 0;
+        while(view_index < view_count)
+        {
+            if(view[view_index] != window[window_index])
+            {
 
-        
+            }
+
+            view_index++;
+        }
+
+
+        src_index += view_size;
         _size -= view_size;
     }
 
