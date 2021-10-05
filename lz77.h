@@ -5,17 +5,20 @@ Implementation of lz77 encoding algorith.
 #include <stdint.h>
 #include <string.h>
 
-struct LinkedList
-{
-    struct Node
-    {
-        uint64_t Length;
-        uint8_t  Literal; // Byte size literal
-        uint64_t Distance;
-    };
 
-    Node* Head;
-};
+typedef struct _lznode
+{
+    uint64_t Length;
+    uint8_t  Literal; // Byte size literal
+    uint64_t Distance;
+
+    struct _lznode* Next;
+} LzNode;
+
+typedef struct _lzLinkedList
+{
+    LzNode* Head;
+} LzLinkedlist;
 
 void* EncodeLZ77(void* _src, size_t _size)
 {
@@ -54,18 +57,31 @@ void* EncodeLZ77(void* _src, size_t _size)
     uint64_t window_start = 0;
     uint64_t window_end   = 0;
 
+    uint8_t* dp = (uint8_t*)calloc(window_count * view_count, sizeof(uint8_t));
+
+    LzLinkedlist linked_list = {};
+    linked_list.Head = (LzNode*)malloc(sizeof(LzNode));
+    linked_list.Head = {};
+
+    LzNode* current = linked_list.Head;
+
     // Fill view buffer with inputs.
     {
         memcpy(view, byte_src, view_size); // Fill lockahead(view) buffer first
         window[0] = view[0];
         // First LDD is always be 0,0,view[0]
-        // Maybe have to implement some kind of linked list for LDD.
+        current->Length = 0;
+        current->Distance = 0;
+        current->Literal  = window[0];
+
         uint64_t curr_size = 1;
 
-
+        
         while(window_size > curr_size)
         {
             
+
+            curr_size++;
         }
     }
     
