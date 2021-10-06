@@ -4,7 +4,7 @@ Implementation of lz77 encoding algorith.
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
-
+#include <stdio.h>
 
 typedef struct _lznode
 {
@@ -57,11 +57,11 @@ void* EncodeLZ77(void* _src, size_t _size)
     uint64_t window_start = 0;
     uint64_t window_end   = 0;
 
-    uint8_t* dp = (uint8_t*)calloc(window_count * view_count, sizeof(uint8_t));
+    uint8_t* dp = (uint8_t*)calloc((window_count + 1) * (view_count + 1), sizeof(uint8_t));
+    memset(dp, 0, sizeof(uint8_t) * (view_count + 1));
 
     LzLinkedlist linked_list = {};
     linked_list.Head = (LzNode*)malloc(sizeof(LzNode));
-    linked_list.Head = {};
 
     LzNode* current = linked_list.Head;
 
@@ -74,14 +74,35 @@ void* EncodeLZ77(void* _src, size_t _size)
         current->Distance = 0;
         current->Literal  = window[0];
 
-        uint64_t curr_size = 1;
+        uint64_t curr_count = 1;
 
+        uint64_t max_i = 0;
+        uint64_t max_j = 0;
         
-        while(window_size > curr_size)
+        while(window_count > curr_count)
         {
-            
+            uint64_t i = 1;
+            for (i; i < view_count+ 1; i++)
+            {
+                dp[(i * view_count)] = 0;
 
-            curr_size++;
+                uint64_t j = 1;
+                for (j; j < curr_count+ 1; j++)
+                {
+                    if(view[i-1] == window[j-1])
+                    {
+                        dp[(i * view_count) + j] = dp[((i - 1) * view_count) + (j - 1)] + 1;
+
+                        if(dp[(i * view_count) + j] > dp[(max_i * view_count) + max_j])
+                        {
+                            max_i = i;
+                            max_j = j;
+                        }
+                    }
+                }
+            }
+
+            curr_count++;
         }
     }
     
