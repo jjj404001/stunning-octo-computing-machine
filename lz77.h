@@ -72,16 +72,16 @@ void* EncodeLZ77(void* _src, size_t _size)
 
         uint64_t curr_count = 0;
 
-        memcpy(view, &byte_src[src_index+1], view_size);
+        memcpy(view, &byte_src[++src_index], view_size); // start from 1st data, since 0st data is gonna stored in window[0]
         window[curr_count++] = byte_src[0];
         
         
         while(window_count > curr_count)
         {
-            int i = 0, j = 0;
+            int i = 0;
             while(i < curr_count)
             {
-                if(window[i] == view[j])
+                if(window[i] == view[0])
                     break;
                 ++i;
             }
@@ -91,18 +91,30 @@ void* EncodeLZ77(void* _src, size_t _size)
                 LzNode* new = (LzNode*)malloc(sizeof(LzNode));
                 new->Length = 0;
                 new->Distance = 0;
-                new->Literal  = window[0];
+                new->Literal  = window[0]; // It have to be the p + length, wrong
 
                 current->Next = new;
                 current = new;
             }
             else
             {
-                
+                LzNode* new = (LzNode*)malloc(sizeof(LzNode));
+                new->Length = 0;
+                new->Distance = window_count - i;
+                new->Literal  = window[i]; // wrong
+
+
+                int j = 0;
+
+                while(window[i++] == view[j++]) // todo : add some barrier to prevent out of bound when i or j gets out of the window or view buffer
+                    ++new->Length;              // also, need Literal have to be valid byte, force quit before the end of buffer
+
+                current->Next = new;
+                current = new;
             }
 
-            memcpy(view, &byte_src[src_index++], view_size);
             window[curr_count++] = view[0];
+            memcpy(view, &byte_src[++src_index], view_size);
         }
     }
     
