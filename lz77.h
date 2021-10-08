@@ -76,9 +76,11 @@ void* EncodeLZ77(void* _src, size_t _size)
         window[curr_count++] = byte_src[0];
         
         
+        // first iteration to fill up the window buffer
         while(window_count > curr_count)
         {
-            int i = 0;
+            int assigned = 0;
+            uint64_t i = 0;
             while(i < curr_count)
             {
                 if(window[i] == view[0])
@@ -91,7 +93,8 @@ void* EncodeLZ77(void* _src, size_t _size)
                 LzNode* new = (LzNode*)malloc(sizeof(LzNode));
                 new->Length = 0;
                 new->Distance = 0;
-                new->Literal  = window[0]; // It have to be the p + length, wrong
+                new->Literal  = window[0];
+                assigned = 1;
 
                 current->Next = new;
                 current = new;
@@ -101,13 +104,22 @@ void* EncodeLZ77(void* _src, size_t _size)
                 LzNode* new = (LzNode*)malloc(sizeof(LzNode));
                 new->Length = 0;
                 new->Distance = window_count - i;
-                new->Literal  = window[i]; // wrong
 
 
-                int j = 0;
+                uint64_t max_it = curr_count - i;
+                if(max_it > view_count)
+                    max_it = view_count;
 
-                while(window[i++] == view[j++]) // todo : add some barrier to prevent out of bound when i or j gets out of the window or view buffer
-                    ++new->Length;              // also, need Literal have to be valid byte, force quit before the end of buffer
+                uint64_t j = 0;
+                while(max_it-- && window[i++] == view[j++])
+                    ++new->Length;              
+
+                if(new->Length < view_count)
+                {
+                    assigned = 1;
+                    new->Literal  = view[new->Length];
+                }
+                    
 
                 current->Next = new;
                 current = new;
@@ -115,30 +127,70 @@ void* EncodeLZ77(void* _src, size_t _size)
 
             window[curr_count++] = view[0];
             memcpy(view, &byte_src[++src_index], view_size);
+
+            if(!assigned)
+                current->Literal = view[view_count - 1]; // todo : add boundary check, can be crash if view[] is out of byte src
         }
     }
     
 
 
-    while(_size > view_size)
+    while(src_index < _size)
     {
-        memcpy(view, &byte_src[src_index], view_size); // use byte_src as view buffer.
-
-        uint64_t view_index   = 0;
-        uint64_t window_index = 0;
-        while(view_index < view_count)
+        int assigned = 0;
+        uint64_t i = 0;
+        while(i < window_count)
         {
-            if(view[view_index] != window[window_index])
-            {
-
-            }
-
-            view_index++;
+            if(window[i] == view[0])
+                break;
+            ++i;
         }
 
 
-        src_index += view_size;
-        _size -= view_size;
+        if (i == window_count) // if i is same with current window size, no p found inside window buffer.
+        {
+            LzNode* new = (LzNode*)malloc(sizeof(LzNode));
+            new->Length = 0;
+            new->Distance = 0;
+            new->Literal  = window[0];
+            assigned = 1;
+
+            current->Next = new;
+            current = new;
+        }
+        else
+        {
+            LzNode* new = (LzNode*)malloc(sizeof(LzNode));
+            new->Length = 0;
+            new->Distance = window_count - i;
+
+
+            uint64_t max_it = window_count - i;
+            if(max_it > view_count)
+                max_it = view_count;
+
+            uint64_t j = 0;
+            while(max_it-- && window[i++] == view[j++])
+                ++new->Length;              
+
+            if(new->Length < view_count)
+            {
+                assigned = 1;
+                new->Literal  = view[new->Length];
+            }
+                
+
+            current->Next = new;
+            current = new;
+        }
+
+        // todo : slide window
+        memcpy(window, &window[1], window_size);
+        window[window_size-1] = view[0];
+        memcpy(view, &byte_src[++src_index], view_size);
+
+        if(!assigned)
+            current->Literal = view[view_count - 1]; // todo : add boundary check, can be crash if view[] is out of byte src
     }
 
 
