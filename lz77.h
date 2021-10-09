@@ -201,6 +201,16 @@ void* EncodeLZ77(void* _src, size_t _size)
         }
     }
 
+    current->Next = NULL;
+    current = linked_list.Head;
+
+    while(current)
+    {
+        printf("LDL : %d, %d, %c \n", current->Length, current->Distance, current->Literal);
+        current = current->Next;
+    }
+    
+
 
 
 
