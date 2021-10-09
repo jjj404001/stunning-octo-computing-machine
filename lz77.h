@@ -179,7 +179,6 @@ void* EncodeLZ77(void* _src, size_t _size)
                 new->Literal  = view[new->Length];
             }
                 
-
             current->Next = new;
             current = new;
         }
@@ -190,7 +189,16 @@ void* EncodeLZ77(void* _src, size_t _size)
         memcpy(view, &byte_src[++src_index], view_size);
 
         if(!assigned)
-            current->Literal = view[view_count - 1]; // todo : add boundary check, can be crash if view[] is out of byte src
+        {
+            if(src_index == _size) // == if view[view_count - 1] goes out of boundary
+            {
+                --current->Length;
+                --current->Distance;
+                current->Literal  = view[current->Length - 1];
+            }
+            else
+                current->Literal = view[view_count - 1];
+        }
     }
 
 
