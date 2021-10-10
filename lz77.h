@@ -48,9 +48,11 @@ void* EncodeLZ77(void* _src, size_t _size)
 
     const size_t window_size = window_count * sizeof(uint8_t);
     const size_t view_size   = view_count   * sizeof(uint8_t);
-
-    uint8_t* window = (uint8_t*)malloc(window_size);
-    uint8_t* view   = (uint8_t*)malloc(view_size);
+    const size_t buffer_size = window_size + view_size;
+    
+    uint8_t* buffer = (uint8_t*)malloc(window_size + view_size);
+    uint8_t* window = &buffer[0];
+    uint8_t* view   = &buffer[window_count]; 
 
     uint64_t src_index    = 0;
     
@@ -75,8 +77,7 @@ void* EncodeLZ77(void* _src, size_t _size)
         uint64_t curr_count = 0;
 
         memcpy(view, &byte_src[++src_index], view_size); // start from 1st data, since 0st data is gonna stored in window[0]
-        window[curr_count++] = byte_src[0];
-        
+        window[curr_count++] = current->Literal;
         
         // first iteration to fill up the window buffer
         while(window_count > curr_count)
@@ -198,7 +199,7 @@ void* EncodeLZ77(void* _src, size_t _size)
 
         // todo : slide window
         memcpy(window, &window[1], window_size);
-        window[window_size-1] = view[0];
+        //window[window_size-1] = view[0];
         memcpy(view, &byte_src[++src_index], view_size);
 
         if(!assigned)
