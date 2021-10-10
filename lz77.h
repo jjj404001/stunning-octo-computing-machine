@@ -24,6 +24,8 @@ void* EncodeLZ77(void* _src, size_t _size)
 {
     /*
     TODO : find a way to return LDD.
+    TODO : We don't actually need two buffer, one big buffer with different entry
+    TODO : With somekind of ring buffer or something..?
     View == Lockahead buffer
     Window == Search buffer
 
@@ -66,9 +68,9 @@ void* EncodeLZ77(void* _src, size_t _size)
     // Fill view buffer with inputs.
     {
         // First LDD is always be 0,0,view[0]
-        current->Length = 0;
+        current->Length   = 0;
         current->Distance = 0;
-        current->Literal  = window[0];
+        current->Literal  = byte_src[0];
 
         uint64_t curr_count = 0;
 
@@ -93,7 +95,7 @@ void* EncodeLZ77(void* _src, size_t _size)
                 LzNode* new = (LzNode*)malloc(sizeof(LzNode));
                 new->Length = 0;
                 new->Distance = 0;
-                new->Literal  = window[0];
+                new->Literal  = view[0];
                 assigned = 1;
 
                 current->Next = new;
@@ -103,7 +105,7 @@ void* EncodeLZ77(void* _src, size_t _size)
             {
                 LzNode* new = (LzNode*)malloc(sizeof(LzNode));
                 new->Length = 0;
-                new->Distance = window_count - i;
+                new->Distance = curr_count - i;
 
 
                 uint64_t max_it = curr_count - i;
@@ -126,10 +128,21 @@ void* EncodeLZ77(void* _src, size_t _size)
             }
 
             window[curr_count++] = view[0];
-            memcpy(view, &byte_src[++src_index], view_size);
+            memcpy(view, &byte_src[src_index += current->Length +1], view_size);
 
             if(!assigned)
-                current->Literal = view[view_count - 1]; // todo : add boundary check, can be crash if view[] is out of byte src
+            {
+                if(src_index == _size) // == if view[view_count - 1] goes out of boundary
+                {
+                    --current->Length;
+                    --current->Distance;
+                    current->Literal  = view[current->Length - 1];
+                    // TODO : add last ldd here.
+                }
+                else
+                    current->Literal = window[curr_count-1]; // it will going to be last element in window buffer,
+                                                // since current ldd comsumes entire view buffer.
+            }
         }
     }
     
@@ -152,7 +165,7 @@ void* EncodeLZ77(void* _src, size_t _size)
             LzNode* new = (LzNode*)malloc(sizeof(LzNode));
             new->Length = 0;
             new->Distance = 0;
-            new->Literal  = window[0];
+            new->Literal  = view[0];
             assigned = 1;
 
             current->Next = new;
