@@ -20,7 +20,7 @@ typedef struct _lzLinkedList
     LzNode* Head;
 } LzLinkedlist;
 
-void* EncodeLZ77(void* _src, size_t _size)
+void* EncodeLZ77(const void* _src, const size_t _size)
 {
     /*
     TODO : find a way to return LDD.
@@ -44,7 +44,7 @@ void* EncodeLZ77(void* _src, size_t _size)
     uint8_t* byte_src = (uint8_t*)_src;
 
     const size_t window_count = 0x06;
-    const size_t view_count   = 0x04;
+    const size_t view_count   = 0x05;
 
     const size_t window_size = window_count * sizeof(uint8_t);
     const size_t view_size   = view_count   * sizeof(uint8_t);
@@ -62,7 +62,7 @@ void* EncodeLZ77(void* _src, size_t _size)
     uint64_t window_end   = 0;
 
 
-    LzLinkedlist linked_list = {};
+    LzLinkedlist linked_list;
     linked_list.Head = (LzNode*)malloc(sizeof(LzNode));
 
     LzNode* current = linked_list.Head;
@@ -110,8 +110,8 @@ void* EncodeLZ77(void* _src, size_t _size)
 
 
                 uint64_t max_it = curr_count - i;
-                if(max_it > view_count)
-                    max_it = view_count;
+                if(max_it > view_count-1)
+                    max_it = view_count-1;
 
                 uint64_t j = 0;
                 while(max_it-- && window[i++] == view[j++])
@@ -128,12 +128,32 @@ void* EncodeLZ77(void* _src, size_t _size)
                 current = new;
             }
 
-            window[curr_count++] = view[0];
+
+            if(current->Length >= view_size-1) // if length is bigger than actual view_size, than it means next p is out of boundary
+            {
+                uint64_t diff = curr_count + view_size; // in case if view buffer is a lot larger than window.
+                uint64_t times = 0;
+                while(diff > window_size)
+                {
+                    diff -= window_size;
+                    ++times; // todo : use this one.
+                }
+
+
+                memcpy(window, &window[diff], curr_count - diff);
+                memcpy(&window[curr_count - diff], view, view_size);
+            }
+            else
+            {
+                memcpy(&window[curr_count], view, current->Length +1);
+            }
             memcpy(view, &byte_src[src_index += current->Length +1], view_size);
+            curr_count += current->Length +1;
+            
 
             if(!assigned)
             {
-                if(src_index == _size) // == if view[view_count - 1] goes out of boundary
+                if(src_index >= _size) // == if view[view_count - 1] goes out of boundary
                 {
                     --current->Length;
                     --current->Distance;
@@ -142,7 +162,7 @@ void* EncodeLZ77(void* _src, size_t _size)
                 }
                 else
                     current->Literal = window[curr_count-1]; // it will going to be last element in window buffer,
-                                                // since current ldd comsumes entire view buffer.
+                                                            // since current ldd comsumes entire view buffer.
             }
         }
     }
@@ -180,8 +200,8 @@ void* EncodeLZ77(void* _src, size_t _size)
 
 
             uint64_t max_it = window_count - i;
-            if(max_it > view_count)
-                max_it = view_count;
+            if(max_it > view_count-1)
+                max_it = view_count-1;
 
             uint64_t j = 0;
             while(max_it-- && window[i++] == view[j++])
@@ -198,13 +218,13 @@ void* EncodeLZ77(void* _src, size_t _size)
         }
 
         // todo : slide window
-        memcpy(window, &window[1], window_size);
+        //memcpy(window, &window[1], window_size);
         //window[window_size-1] = view[0];
-        memcpy(view, &byte_src[++src_index], view_size);
+        memcpy(buffer, &byte_src[src_index += current->Length +1], buffer_size);
 
         if(!assigned)
         {
-            if(src_index == _size) // == if view[view_count - 1] goes out of boundary
+            if(src_index >= _size) // == if view[view_count - 1] goes out of boundary
             {
                 --current->Length;
                 --current->Distance;
@@ -224,11 +244,5 @@ void* EncodeLZ77(void* _src, size_t _size)
         current = current->Next;
     }
     
-
-
-
-
-
-    free(window);
-    free(view);
+    free(buffer);
 }
