@@ -44,7 +44,7 @@ void* EncodeLZ77(const void* _src, const size_t _size)
     uint8_t* byte_src = (uint8_t*)_src;
 
     const size_t window_count = 0x06;
-    const size_t view_count   = 0x05;
+    const size_t view_count   = 0x04;
 
     const size_t window_size = window_count * sizeof(uint8_t);
     const size_t view_size   = view_count   * sizeof(uint8_t);
@@ -58,7 +58,7 @@ void* EncodeLZ77(const void* _src, const size_t _size)
     
     uint64_t view_start = 0;
     uint64_t view_end   = 0;
-    uint64_t window_start = 0;
+    uint64_t window_start = window_count -1;
     uint64_t window_end   = 0;
 
 
@@ -74,97 +74,12 @@ void* EncodeLZ77(const void* _src, const size_t _size)
         current->Distance = 0;
         current->Literal  = byte_src[0];
 
-        uint64_t curr_count = 0;
+        uint64_t curr_count = 1;
 
         memcpy(view, &byte_src[++src_index], view_size); // start from 1st data, since 0st data is gonna stored in window[0]
-        window[curr_count++] = current->Literal;
+        window[window_start--] = current->Literal;
         
         // first iteration to fill up the window buffer
-        while(window_count > curr_count)
-        {
-            int assigned = 0;
-            uint64_t i = 0;
-            while(i < curr_count)
-            {
-                if(window[i] == view[0])
-                    break;
-                ++i;
-            }
-
-            if (i == curr_count) // if i is same with current window size, no p found inside window buffer.
-            {
-                LzNode* new = (LzNode*)malloc(sizeof(LzNode));
-                new->Length = 0;
-                new->Distance = 0;
-                new->Literal  = view[0];
-                assigned = 1;
-
-                current->Next = new;
-                current = new;
-            }
-            else
-            {
-                LzNode* new = (LzNode*)malloc(sizeof(LzNode));
-                new->Length = 0;
-                new->Distance = curr_count - i;
-
-
-                uint64_t max_it = curr_count - i;
-                if(max_it > view_count-1)
-                    max_it = view_count-1;
-
-                uint64_t j = 0;
-                while(max_it-- && window[i++] == view[j++])
-                    ++new->Length;              
-
-                if(new->Length < view_count)
-                {
-                    assigned = 1;
-                    new->Literal  = view[new->Length];
-                }
-                    
-
-                current->Next = new;
-                current = new;
-            }
-
-
-            if(current->Length >= view_size-1) // if length is bigger than actual view_size, than it means next p is out of boundary
-            {
-                uint64_t diff = curr_count + view_size; // in case if view buffer is a lot larger than window.
-                uint64_t times = 0;
-                while(diff > window_size)
-                {
-                    diff -= window_size;
-                    ++times; // todo : use this one.
-                }
-
-
-                memcpy(window, &window[diff], curr_count - diff);
-                memcpy(&window[curr_count - diff], view, view_size);
-            }
-            else
-            {
-                memcpy(&window[curr_count], view, current->Length +1);
-            }
-            memcpy(view, &byte_src[src_index += current->Length +1], view_size);
-            curr_count += current->Length +1;
-            
-
-            if(!assigned)
-            {
-                if(src_index >= _size) // == if view[view_count - 1] goes out of boundary
-                {
-                    --current->Length;
-                    --current->Distance;
-                    current->Literal  = view[current->Length - 1];
-                    // TODO : add last ldd here.
-                }
-                else
-                    current->Literal = window[curr_count-1]; // it will going to be last element in window buffer,
-                                                            // since current ldd comsumes entire view buffer.
-            }
-        }
     }
     
 
