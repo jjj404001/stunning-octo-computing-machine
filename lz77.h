@@ -41,6 +41,9 @@ void* EncodeLZ77(const void* _src, const size_t _size)
     need to revisit LCS...
     */
 
+    if(_size < 1)
+        return NULL;
+
     uint8_t* byte_src = (uint8_t*)_src;
 
     const size_t window_count = 0x06;
@@ -77,9 +80,65 @@ void* EncodeLZ77(const void* _src, const size_t _size)
         uint64_t curr_count = 1;
 
         memcpy(view, &byte_src[++src_index], view_size); // start from 1st data, since 0st data is gonna stored in window[0]
-        window[window_start--] = current->Literal;
+        window[window_start] = current->Literal;
         
         // first iteration to fill up the window buffer
+        while(curr_count < window_count)
+        {
+            uint64_t i = window_start;
+            uint64_t search = 0; // count current searched element
+            while(search < curr_count)
+            {
+                if(window[i] == view[0])
+                    break;
+                --i; // Iterate backward.
+                ++search;
+            }
+
+            if (search == curr_count) // if search is same with current window size, no p found inside window buffer.
+            {
+                LzNode* new = (LzNode*)malloc(sizeof(LzNode));
+                new->Length = 0;
+                new->Distance = 0;
+                new->Literal  = view[0];
+
+                current->Next = new;
+                current = new;
+            }
+            else
+            {
+                LzNode* new = (LzNode*)malloc(sizeof(LzNode));
+                new->Length   = 0;
+                new->Distance = window_count - i;
+
+                uint64_t max_it = curr_count;
+                if(curr_count > view_count) // TODO: use MIN here.
+                    max_it = view_count;
+
+                uint64_t j = 0;
+                while(max_it-- && window[i++] == view[j++])
+                    ++new->Length;
+
+                if(new->Length < view_count)
+                {
+                    new->Literal  = view[new->Length];
+                }
+                else
+                {
+                    current->Next = new;
+                    current = new;
+                    continue;
+                }
+
+                
+                current->Next = new;
+                current = new;
+            }
+
+
+            memcpy(buffer, &byte_src[src_index -= current->Length +1], buffer_size);
+            curr_count += current->Length +1;
+        }
     }
     
 
