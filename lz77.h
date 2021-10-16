@@ -59,10 +59,7 @@ void* EncodeLZ77(const void* _src, const size_t _size)
 
     uint64_t src_index    = 0;
     
-    uint64_t view_start = 0;
-    uint64_t view_end   = 0;
-    uint64_t window_start = window_count -1;
-    uint64_t window_end   = 0;
+
 
 
     LzLinkedlist linked_list;
@@ -72,6 +69,10 @@ void* EncodeLZ77(const void* _src, const size_t _size)
 
     // Fill view buffer with inputs.
     {
+        uint64_t view_start = 0;
+        uint64_t view_end   = 0;
+        uint64_t window_start = window_count -1;
+        uint64_t window_end   = 0;
         // First LDD is always be 0,0,view[0]
         current->Length   = 0;
         current->Distance = 0;
@@ -86,16 +87,15 @@ void* EncodeLZ77(const void* _src, const size_t _size)
         while(curr_count < window_count)
         {
             uint64_t i = window_start;
-            uint64_t search = 0; // count current searched element
-            while(search < curr_count)
+
+            while(i < window_count)
             {
                 if(window[i] == view[0])
                     break;
-                --i; // Iterate backward.
-                ++search;
+                i++;
             }
 
-            if (search == curr_count) // if search is same with current window size, no p found inside window buffer.
+            if (i == window_count) // if i is same with current window size, no p found inside window buffer.
             {
                 LzNode* new = (LzNode*)malloc(sizeof(LzNode));
                 new->Length = 0;
@@ -119,25 +119,16 @@ void* EncodeLZ77(const void* _src, const size_t _size)
                 while(max_it-- && window[i++] == view[j++])
                     ++new->Length;
 
-                if(new->Length < view_count)
-                {
-                    new->Literal  = view[new->Length];
-                }
-                else
-                {
-                    current->Next = new;
-                    current = new;
-                    continue;
-                }
-
-                
                 current->Next = new;
                 current = new;
             }
 
 
-            memcpy(buffer, &byte_src[src_index -= current->Length +1], buffer_size);
             curr_count += current->Length +1;
+            window_start -= current->Length +1;
+            src_index += current->Length +1;
+            memcpy(&window[window_start], &byte_src[src_index], window_count + view_count);
+            
         }
     }
     
