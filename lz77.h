@@ -46,8 +46,9 @@ void* EncodeLZ77(const void* _src, const size_t _size)
 
     uint8_t* byte_src = (uint8_t*)_src;
 
-    const size_t window_count = 0x06;
-    const size_t view_count   = 0x04;
+    size_t window_count = 0x06;
+    size_t view_count   = 0x04;
+    const size_t buffer_count = window_count + view_count;
 
     const size_t window_size = window_count * sizeof(uint8_t);
     const size_t view_size   = view_count   * sizeof(uint8_t);
@@ -80,7 +81,7 @@ void* EncodeLZ77(const void* _src, const size_t _size)
 
         uint64_t curr_count = 1;
 
-        memcpy(view, &byte_src[++src_index], view_size); // start from 1st data, since 0st data is gonna stored in window[0]
+        memcpy(view, &byte_src[1], view_size); // start from 1st data, since 0st data is gonna stored in window[0]
         window[window_start] = current->Literal;
         
         // first iteration to fill up the window buffer
@@ -119,6 +120,28 @@ void* EncodeLZ77(const void* _src, const size_t _size)
                 while(max_it-- && window[i++] == view[j++])
                     ++new->Length;
 
+                if(new->Length == view_count)
+                {
+                    if(buffer_count > _size - (src_index+1))// if it goes out of the source size
+                    {
+                        view_count -= (buffer_count - _size - (src_index+1));
+                    }
+                    else
+                    {
+                        memcpy(buffer, &byte_src[src_index += new->Length - window_start], buffer_count);
+                        new->Literal = view[-1]; // last element of window
+                        current->Next = new;
+                        current = new;
+
+                        curr_count = window_count;
+                        window_start = 0;
+                    }
+                    
+                    continue;
+                }
+                else
+                    new->Literal = view[new->Length];
+
                 current->Next = new;
                 current = new;
             }
@@ -126,79 +149,12 @@ void* EncodeLZ77(const void* _src, const size_t _size)
 
             curr_count += current->Length +1;
             window_start -= current->Length +1;
-            src_index += current->Length +1;
+            //src_index += current->Length +1;
             memcpy(&window[window_start], &byte_src[src_index], window_count + view_count);
-            
         }
     }
     
-
-
-    while(src_index < _size)
-    {
-        int assigned = 0;
-        uint64_t i = 0;
-        while(i < window_count)
-        {
-            if(window[i] == view[0])
-                break;
-            ++i;
-        }
-
-
-        if (i == window_count) // if i is same with current window size, no p found inside window buffer.
-        {
-            LzNode* new = (LzNode*)malloc(sizeof(LzNode));
-            new->Length = 0;
-            new->Distance = 0;
-            new->Literal  = view[0];
-            assigned = 1;
-
-            current->Next = new;
-            current = new;
-        }
-        else
-        {
-            LzNode* new = (LzNode*)malloc(sizeof(LzNode));
-            new->Length = 0;
-            new->Distance = window_count - i;
-
-
-            uint64_t max_it = window_count - i;
-            if(max_it > view_count-1)
-                max_it = view_count-1;
-
-            uint64_t j = 0;
-            while(max_it-- && window[i++] == view[j++])
-                ++new->Length;              
-
-            if(new->Length < view_count)
-            {
-                assigned = 1;
-                new->Literal  = view[new->Length];
-            }
-                
-            current->Next = new;
-            current = new;
-        }
-
-        // todo : slide window
-        //memcpy(window, &window[1], window_size);
-        //window[window_size-1] = view[0];
-        memcpy(buffer, &byte_src[src_index += current->Length +1], buffer_size);
-
-        if(!assigned)
-        {
-            if(src_index >= _size) // == if view[view_count - 1] goes out of boundary
-            {
-                --current->Length;
-                --current->Distance;
-                current->Literal  = view[current->Length - 1];
-            }
-            else
-                current->Literal = view[view_count - 1];
-        }
-    }
+    // TODO : next part
 
     current->Next = NULL;
     current = linked_list.Head;
