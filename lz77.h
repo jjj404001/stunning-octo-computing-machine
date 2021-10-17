@@ -60,7 +60,7 @@ void* EncodeLZ77(const void* _src, const size_t _size)
 
     uint64_t src_index    = 0;
     
-
+    uint64_t total_size = 0;
 
 
     LzLinkedlist linked_list;
@@ -80,6 +80,8 @@ void* EncodeLZ77(const void* _src, const size_t _size)
         current->Length   = 0;
         current->Distance = 0;
         current->Literal  = byte_src[0];
+
+        ++total_size;
 
         uint64_t curr_count = 1;
 
@@ -124,7 +126,7 @@ void* EncodeLZ77(const void* _src, const size_t _size)
 
                 if(new->Length == curr_view_count)
                 {
-                    uint64_t new_src_index = src_index + new->Length - window_start;
+                    uint64_t new_src_index = src_index + new->Length - window_start + 1;
 
                     if(buffer_count > _size - new_src_index)// if it goes out of the source size
                     {
@@ -133,17 +135,16 @@ void* EncodeLZ77(const void* _src, const size_t _size)
                         memcpy(buffer, &byte_src[new_src_index], buffer_count-diff);
                     }
                     else
-                    {
                         memcpy(buffer, &byte_src[new_src_index], buffer_count);
-                        new->Literal = view[-1]; // last element of window
-                        current->Next = new;
-                        current = new;
 
-                        curr_count = window_count;
-                        window_start = 0;
-                    }
-                    
+                    new->Literal = view[-1]; // last element of window
+                    curr_count = window_count;
+                    window_start = 0;
+                    total_size += new->Length +1;
                     src_index = new_src_index;
+
+                    current->Next = new;
+                    current = new;
                     continue;
                 }
                 else
@@ -154,9 +155,10 @@ void* EncodeLZ77(const void* _src, const size_t _size)
             }
 
 
+            
             curr_count += current->Length +1;
             window_start -= current->Length +1;
-            //
+            total_size += current->Length +1;
             memcpy(&window[window_start], &byte_src[src_index], window_count + curr_view_count);
         }
     }
@@ -166,7 +168,7 @@ void* EncodeLZ77(const void* _src, const size_t _size)
         min_count = window_count;
 
      
-    while(src_index < _size)
+    while(total_size < _size)
     {
         uint64_t i = window_start;
         while(i < window_count)
@@ -209,8 +211,8 @@ void* EncodeLZ77(const void* _src, const size_t _size)
             current->Next = new;
             current = new;
         }
-
-        src_index += current->Length +1;
+        total_size += current->Length +1;
+        src_index  += current->Length +1;
         memcpy(buffer, &byte_src[src_index], buffer_size);
     }
 
