@@ -46,8 +46,8 @@ void* EncodeLZ77(const void* _src, const size_t _size)
 
     uint8_t* byte_src = (uint8_t*)_src;
 
-    size_t window_count = 0x06;
-    size_t view_count   = 0x04;
+    const size_t window_count = 0x06;
+    const size_t view_count   = 0x04;
     const size_t buffer_count = window_count + view_count;
 
     const size_t window_size = window_count * sizeof(uint8_t);
@@ -68,12 +68,14 @@ void* EncodeLZ77(const void* _src, const size_t _size)
 
     LzNode* current = linked_list.Head;
 
+    uint64_t view_start = 0;
+    uint64_t view_end   = 0;
+    uint64_t window_start = window_count -1;
+    uint64_t window_end   = 0;
+
     // Fill view buffer with inputs.
     {
-        uint64_t view_start = 0;
-        uint64_t view_end   = 0;
-        uint64_t window_start = window_count -1;
-        uint64_t window_end   = 0;
+        size_t curr_view_count = view_count;
         // First LDD is always be 0,0,view[0]
         current->Length   = 0;
         current->Distance = 0;
@@ -113,22 +115,26 @@ void* EncodeLZ77(const void* _src, const size_t _size)
                 new->Distance = window_count - i;
 
                 uint64_t max_it = curr_count;
-                if(curr_count > view_count) // TODO: use MIN here.
-                    max_it = view_count;
+                if(curr_count > curr_view_count) // TODO: use MIN here.
+                    max_it = curr_view_count;
 
                 uint64_t j = 0;
                 while(max_it-- && window[i++] == view[j++])
                     ++new->Length;
 
-                if(new->Length == view_count)
+                if(new->Length == curr_view_count)
                 {
-                    if(buffer_count > _size - (src_index+1))// if it goes out of the source size
+                    uint64_t new_src_index = src_index + new->Length - window_start;
+
+                    if(buffer_count > _size - new_src_index)// if it goes out of the source size
                     {
-                        view_count -= (buffer_count - _size - (src_index+1));
+                        uint64_t diff = buffer_count - (_size - new_src_index);
+                        curr_view_count -= diff;
+                        memcpy(buffer, &byte_src[new_src_index], buffer_count-diff);
                     }
                     else
                     {
-                        memcpy(buffer, &byte_src[src_index += new->Length - window_start], buffer_count);
+                        memcpy(buffer, &byte_src[new_src_index], buffer_count);
                         new->Literal = view[-1]; // last element of window
                         current->Next = new;
                         current = new;
@@ -137,6 +143,7 @@ void* EncodeLZ77(const void* _src, const size_t _size)
                         window_start = 0;
                     }
                     
+                    src_index = new_src_index;
                     continue;
                 }
                 else
@@ -149,12 +156,63 @@ void* EncodeLZ77(const void* _src, const size_t _size)
 
             curr_count += current->Length +1;
             window_start -= current->Length +1;
-            //src_index += current->Length +1;
-            memcpy(&window[window_start], &byte_src[src_index], window_count + view_count);
+            //
+            memcpy(&window[window_start], &byte_src[src_index], window_count + curr_view_count);
         }
     }
-    
-    // TODO : next part
+
+    uint64_t min_count = view_count;
+    if(min_count > window_count) 
+        min_count = window_count;
+
+     
+    while(src_index < _size)
+    {
+        uint64_t i = window_start;
+        while(i < window_count)
+        {
+            if(window[i] == view[0])
+                break;
+            i++;
+        }
+
+        if (i == window_count) // if i is same with current window size, no p found inside window buffer.
+        {
+            LzNode* new = (LzNode*)malloc(sizeof(LzNode));
+            new->Length = 0;
+            new->Distance = 0;
+            new->Literal  = view[0];
+
+            current->Next = new;
+            current = new;
+        }
+        else
+        {
+            LzNode* new = (LzNode*)malloc(sizeof(LzNode));
+            new->Length   = 0;
+            new->Distance = window_count - i;
+
+            uint64_t max_it = min_count;
+
+            uint64_t j = 0;
+            while(max_it-- && window[i++] == view[j++])
+                ++new->Length;
+
+            // If src_index goes out of the src.
+            if(src_index + window_count + new->Length > _size)
+            {
+                
+            }
+            else
+                new->Literal = view[new->Length];
+
+            current->Next = new;
+            current = new;
+        }
+
+        src_index += current->Length +1;
+        memcpy(buffer, &byte_src[src_index], buffer_size);
+    }
 
     current->Next = NULL;
     current = linked_list.Head;

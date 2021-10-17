@@ -8,10 +8,10 @@ int main(void)
     EncodeLZ77(str, strlen(str));
 
     str = "abcdabcdabc"; // failed at this point
-    EncodeLZ77(str, sizeof(str));
+    EncodeLZ77(str, strlen(str));
 
     str = "abcdefaababc"; // failed at this point
-    EncodeLZ77(str, sizeof(str));
+    EncodeLZ77(str, strlen(str));
 
     return 0;
 }
