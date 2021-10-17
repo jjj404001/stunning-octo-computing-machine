@@ -201,9 +201,15 @@ void* EncodeLZ77(const void* _src, const size_t _size)
                 ++new->Length;
 
             // If src_index goes out of the src.
-            if(src_index + window_count + new->Length > _size)
+            if(total_size + new->Length + 1>= _size) // +1 for literal.
             {
-                
+                uint64_t diff = _size - total_size;
+                new->Length  = diff - 1;
+                new->Literal = view[new->Length];
+
+                current->Next = new;
+                current = new; 
+                break; // break here to reduce memcpy
             }
             else
                 new->Literal = view[new->Length];
