@@ -17,32 +17,15 @@ typedef struct _lznode
 
 typedef struct _lzLinkedList
 {
+    uint64_t SizeInByte;
     LzNode* Head;
 } LzLinkedlist;
 
-void* EncodeLZ77(const void* _src, const size_t _size)
+LzLinkedlist EncodeLZ77(const void* _src, const size_t _size)
 {
-    /*
-    TODO : find a way to return LDD.
-    TODO : We don't actually need two buffer, one big buffer with different entry
-    TODO : With somekind of ring buffer or something..?
-    View == Lockahead buffer
-    Window == Search buffer
-
-    peudo code
-
-    1. fill view buffer with inputs.
-    2. find longest common data string from windows.
-        2-1. fill window buffer with data if there are no common data.
-    Distance = distance from the start of common data to start of view buffer.
-    Length   = length of common data.
-    Literal  = data at the p + Length.
-
-    need to revisit LCS...
-    */
-
+    LzLinkedlist linked_list;
     if(_size < 1)
-        return NULL;
+        return linked_list; // NULL
 
     uint8_t* byte_src = (uint8_t*)_src;
 
@@ -63,7 +46,7 @@ void* EncodeLZ77(const void* _src, const size_t _size)
     uint64_t total_size = 0;
 
 
-    LzLinkedlist linked_list;
+    
     linked_list.Head = (LzNode*)malloc(sizeof(LzNode));
 
     LzNode* current = linked_list.Head;
@@ -221,11 +204,11 @@ void* EncodeLZ77(const void* _src, const size_t _size)
         src_index  += current->Length +1;
         memcpy(buffer, &byte_src[src_index], buffer_size);
     }
-
     current->Next = NULL;
-    current = linked_list.Head;
     
     free((void*)buffer);
 
-    return linked_list.Head;
+    linked_list.SizeInByte = _size;
+
+    return linked_list;
 }
