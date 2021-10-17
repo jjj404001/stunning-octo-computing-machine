@@ -205,10 +205,47 @@ LzLinkedlist EncodeLZ77(const void* _src, const size_t _size)
         memcpy(buffer, &byte_src[src_index], buffer_size);
     }
     current->Next = NULL;
-    
+
     free((void*)buffer);
 
     linked_list.SizeInByte = _size;
 
     return linked_list;
+}
+
+uint8_t* DecodeLZ77(LzLinkedlist _linked_list)
+{
+    LzNode* node = _linked_list.Head;
+    uint8_t* result = (uint8_t*)malloc(_linked_list.SizeInByte +1);
+
+    uint64_t src_index = 0;
+    while(node)
+    {
+        if(node->Length > 0)
+        {
+            memcpy(&result[src_index], &result[src_index - node->Distance], node->Length);
+            result[src_index + node->Length] = node->Literal;
+            src_index += node->Length + 1;
+        }
+        else
+            result[src_index++] = node->Literal;
+
+        LzNode* next = node->Next;
+        free(node);
+        node = next;
+    }
+
+    return result;
+}
+
+void FreeLZ77(LzLinkedlist _linked_list)
+{
+    LzNode* node = _linked_list.Head;
+
+    while(node)
+    {
+        LzNode* next = node->Next;
+        free(node);
+        node = next;
+    }
 }
