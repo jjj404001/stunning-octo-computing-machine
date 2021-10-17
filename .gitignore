@@ -6,6 +6,7 @@
 
 .vscode
 *.exe
+*.glb
 # User-specific files
 *.rsuser
 *.suo
@@ -351,4 +352,3 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
-a.exe
