@@ -226,4 +226,6 @@ void* EncodeLZ77(const void* _src, const size_t _size)
     }
     
     free(buffer);
+
+    return linked_list.Head;
 }
