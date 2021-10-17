@@ -29,8 +29,8 @@ LzLinkedlist EncodeLZ77(const void* _src, const size_t _size)
 
     uint8_t* byte_src = (uint8_t*)_src;
 
-    const size_t window_count = 0x06;
-    const size_t view_count   = 0x04;
+    const size_t window_count = 0x400;
+    const size_t view_count   = 0x400;
     const size_t buffer_count = window_count + view_count;
 
     const size_t window_size = window_count * sizeof(uint8_t);
@@ -72,7 +72,7 @@ LzLinkedlist EncodeLZ77(const void* _src, const size_t _size)
         window[window_start] = current->Literal;
         
         // first iteration to fill up the window buffer
-        while(curr_count < window_count)
+        while(curr_count < window_count && curr_count < _size)
         {
             uint64_t i = window_start;
 
@@ -104,10 +104,14 @@ LzLinkedlist EncodeLZ77(const void* _src, const size_t _size)
                     max_it = curr_view_count;
 
                 uint64_t j = 0;
-                while(max_it-- && window[i++] == view[j++])
+                while(max_it && window[i++] == view[j++])
+                {
+                    --max_it;
                     ++new->Length;
+                }
+                    
 
-                if(new->Length == curr_view_count)
+                if(!max_it)
                 {
                     uint64_t new_src_index = src_index + new->Length - window_start + 1;
 

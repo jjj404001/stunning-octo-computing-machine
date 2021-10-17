@@ -79,24 +79,26 @@ int compare_and_free_test(void* _buff, size_t _type_size, size_t _buff_count)
 int main(void)
 {
     char* str = "abcdabcdabcc";
-    print_and_free_test(str, sizeof(char), strlen(str));
+    compare_and_free_test(str, sizeof(char), strlen(str));
     str = "abcdabcdabc";
-    print_and_free_test(str, sizeof(char), strlen(str));
+    compare_and_free_test(str, sizeof(char), strlen(str));
     str = "abcdefaababc";
-    print_and_free_test(str, sizeof(char), strlen(str));
+    compare_and_free_test(str, sizeof(char), strlen(str));
     str = "aabcdeabcd";
-    print_and_free_test(str, sizeof(char), strlen(str));
-/*
+    compare_and_free_test(str, sizeof(char), strlen(str));
+
+    fflush(stdout);
+
     FILE* file = fopen("MetalRoughSpheres.glb", "rb");
     fseek(file, 0L, SEEK_END);
     uint64_t file_size = ftell(file);
     rewind(file);
 
     uint8_t* file_buff = (uint8_t*)malloc(file_size);
-    LzLinkedlist linked_list = EncodeLZ77(file_buff, 1);
+    //compare_and_free_test(file_buff, sizeof(uint8_t), file_size);
 
     free(file_buff);
     fclose(file);
-*/
+
     return 0;
 }
