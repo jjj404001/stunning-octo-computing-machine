@@ -159,7 +159,7 @@ void* EncodeLZ77(const void* _src, const size_t _size)
             curr_count += current->Length +1;
             window_start -= current->Length +1;
             total_size += current->Length +1;
-            memcpy(&window[window_start], &byte_src[src_index], window_count + curr_view_count);
+            memcpy(&window[window_start], &byte_src[src_index], window_count - window_start + curr_view_count);
         }
     }
 
@@ -218,14 +218,8 @@ void* EncodeLZ77(const void* _src, const size_t _size)
 
     current->Next = NULL;
     current = linked_list.Head;
-
-    while(current)
-    {
-        printf("LDL : %d, %d, %c \n", current->Length, current->Distance, current->Literal);
-        current = current->Next;
-    }
     
-    free(buffer);
+    free((void*)buffer);
 
     return linked_list.Head;
 }
