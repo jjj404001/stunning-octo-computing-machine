@@ -4,7 +4,7 @@ int print_test(void* _buff, size_t _type_size, size_t _buff_count)
 {
     LzNode* node = EncodeLZ77(_buff, _type_size * _buff_count);
 
-    
+    printf("-----------------------------------------------------\n");
     while(node)
     {
         printf("LDL : %d, %d, %c \n", node->Length, node->Distance, node->Literal);
@@ -12,6 +12,7 @@ int print_test(void* _buff, size_t _type_size, size_t _buff_count)
         free(node);
         node = next;
     }
+    printf("=====================================================\n");
 
     return 1;
 }
