@@ -34,7 +34,14 @@ int print_and_free_test(void* _buff, size_t _type_size, size_t _buff_count)
     if(!strcmp((const char*)_buff, (const char*)result))
         printf("Pass\n");
     else
-        printf("Failed\n");
+    {
+        printf("Failed : ");
+        printf((const char*)_buff);
+        printf(" != ");
+        printf((const char*)result);
+        printf("\n");
+    }   
+        
     printf("=====================================================\n");
 
     free(result);

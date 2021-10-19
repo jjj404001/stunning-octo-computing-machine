@@ -132,9 +132,21 @@ LzLinkedlist EncodeLZ77(const void* _src, const size_t _size)
 
 
             
-            curr_count += current->Length +1;
-            window_start -= current->Length +1;
-            total_size += current->Length +1;
+            
+            if(window_start >= current->Length +1)
+            {
+                window_start -= current->Length +1;
+                curr_count += current->Length +1;
+                total_size += current->Length +1;
+            }
+            else
+            {
+                curr_count += window_start;
+                total_size += window_start;
+                window_start = 0;
+            }
+                
+            
             memcpy(&window[window_start], &byte_src[src_index], window_count - window_start + curr_view_count);
         }
 
