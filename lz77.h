@@ -29,8 +29,10 @@ LzLinkedlist EncodeLZ77(const void* _src, const size_t _size)
 
     uint8_t* byte_src = (uint8_t*)_src;
 
-    const size_t window_count = 0x400;
-    const size_t view_count   = 0x400;
+    //const size_t window_count = 0x200;
+    //const size_t view_count   = 0x200;
+    const size_t window_count = 0x06;
+    const size_t view_count   = 0x04;
     const size_t buffer_count = window_count + view_count;
 
     const size_t window_size = window_count * sizeof(uint8_t);
@@ -51,8 +53,6 @@ LzLinkedlist EncodeLZ77(const void* _src, const size_t _size)
 
     LzNode* current = linked_list.Head;
 
-    uint64_t view_start = 0;
-    uint64_t view_end   = 0;
     uint64_t window_start = window_count -1;
     uint64_t window_end   = 0;
 
@@ -113,26 +113,15 @@ LzLinkedlist EncodeLZ77(const void* _src, const size_t _size)
 
                 if(!max_it)
                 {
-                    uint64_t new_src_index = src_index + new->Length - window_start + 1;
-
-                    if(buffer_count > _size - new_src_index)// if it goes out of the source size
+                    if(new->Length >= view_count)
                     {
-                        uint64_t diff = buffer_count - (_size - new_src_index);
-                        curr_view_count -= diff;
-                        memcpy(buffer, &byte_src[new_src_index], buffer_count-diff);
+                        new->Length = view_count-1;
+                        new->Literal = view[new->Length];
                     }
-                    else
-                        memcpy(buffer, &byte_src[new_src_index], buffer_count);
-
-                    new->Literal = view[-1]; // last element of window
-                    curr_count = window_count;
-                    window_start = 0;
-                    total_size += new->Length +1;
-                    src_index = new_src_index;
-
-                    current->Next = new;
-                    current = new;
-                    continue;
+                    else // else if literal still sit inside of the buffer
+                    {
+                        new->Literal = view[new->Length];
+                    }
                 }
                 else
                     new->Literal = view[new->Length];
@@ -148,6 +137,8 @@ LzLinkedlist EncodeLZ77(const void* _src, const size_t _size)
             total_size += current->Length +1;
             memcpy(&window[window_start], &byte_src[src_index], window_count - window_start + curr_view_count);
         }
+
+        total_size = curr_count;
     }
 
     uint64_t min_count = view_count;
