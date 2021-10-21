@@ -86,7 +86,7 @@ int compare_and_free_test(void* _buff, size_t _type_size, size_t _buff_count)
 int main(void)
 {
     char* str = "abcdabcdabcc";
-    //compare_and_free_test(str, sizeof(char), strlen(str));
+    print_and_free_test(str, sizeof(char), strlen(str));
     str = "abcdabcdabc";
     print_and_free_test(str, sizeof(char), strlen(str));
     str = "abcdefaababc";
