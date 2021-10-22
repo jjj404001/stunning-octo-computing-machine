@@ -61,7 +61,7 @@ LzLinkedlist EncodeLZ77(const void* _src, const size_t _size)
     uint64_t window_start = 0;
     uint64_t window_end   = 0;
 
-    memcpy(view, byte_src, view_size);
+    memcpy(buffer, byte_src, buffer_size); // Should I do something like min(buffer_size, _size) ? 
 
     while(total_size < _size)
     {
@@ -84,15 +84,42 @@ LzLinkedlist EncodeLZ77(const void* _src, const size_t _size)
 
             current->Next = new; 
             current = new;
-
-            inc += 1;
         }
-        
+        else // found
+        {
+            LzNode* new = (LzNode*)malloc(sizeof(LzNode));
+            new->Distance = p - i;
+            new->Length = 0;
+
+            while(new->Length + i < window_end)
+            {
+                ++new->Length;
+                ++j;
+                if(window[i + new->Length] != view[j])
+                    break;
+            }
+
+            if(view_count > new->Length)
+            {
+                current->Literal = view[new->Length];
+            }
+            else
+            {
+                new->Length  = view_count-1; 
+                new->Literal = view[new->Length];
+            }
+
+            current->Next = new; 
+            current = new;
+        }
+        inc += current->Length +1;
 
         total_size += inc;
 
-        //window_start += inc;
+        // Treat out of boundary issue 
         window_end += inc;
+        if(window_end >= window_count)
+            window_start += window_end - window_count;
 
         view_start += inc;
         view_end += inc;
