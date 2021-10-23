@@ -99,14 +99,14 @@ LzLinkedlist EncodeLZ77(const void* _src, const size_t _size)
                     break;
             }
 
-            if(view_count > new->Length)
+            if(view_end > new->Length + view_start)
             {
-                new->Literal = view[new->Length];
+                new->Literal = view[new->Length + view_start];
             }
             else
             {
                 new->Length  = view_count-1; 
-                new->Literal = view[new->Length];
+                new->Literal = view[new->Length + view_start];
             }
 
             current->Next = new; 
