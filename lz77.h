@@ -101,7 +101,7 @@ LzLinkedlist EncodeLZ77(const void* _src, const size_t _size)
 
             if(view_count > new->Length)
             {
-                current->Literal = view[new->Length];
+                new->Literal = view[new->Length];
             }
             else
             {
