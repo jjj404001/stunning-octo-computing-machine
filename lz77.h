@@ -31,10 +31,10 @@ LzLinkedlist EncodeLZ77(const void* _src, const size_t _size)
 
     uint8_t* byte_src = (uint8_t*)_src;
 
-    //const size_t window_count = 0x200;
-    //const size_t view_count   = 0x200;
-    const size_t window_count = 0x06;
-    const size_t view_count   = 0x04;
+    const size_t window_count = 0x200;
+    const size_t view_count   = 0x200;
+    //const size_t window_count = 0x06;
+    //const size_t view_count   = 0x04;
     const size_t extra_count  = LZMIN(window_count, view_count);
     const size_t buffer_count = window_count + view_count + (extra_count * 2);
 
@@ -43,7 +43,8 @@ LzLinkedlist EncodeLZ77(const void* _src, const size_t _size)
     const size_t buffer_size = buffer_count * sizeof(uint8_t);
 
     
-    uint8_t* buffer = (uint8_t*)malloc(buffer_size);
+    //uint8_t* buffer = (uint8_t*)malloc(buffer_size);
+    uint8_t* buffer = byte_src;
     uint8_t* window = &buffer[0];
     uint8_t* view   = &buffer[0]; 
     uint64_t p = 0;
@@ -61,7 +62,9 @@ LzLinkedlist EncodeLZ77(const void* _src, const size_t _size)
     uint64_t window_start = 0;
     uint64_t window_end   = 0;
 
-    memcpy(buffer, byte_src, buffer_size); // Should I do something like min(buffer_size, _size) ? 
+    int temp = 0;
+
+    //memcpy(buffer, byte_src, buffer_size); // Should I do something like min(buffer_size, _size) ? 
 
     while(total_size < _size)
     {
@@ -88,7 +91,7 @@ LzLinkedlist EncodeLZ77(const void* _src, const size_t _size)
         else // found
         {
             LzNode* new = (LzNode*)malloc(sizeof(LzNode));
-            new->Distance = p - i;
+            new->Distance = p - i; // i > p??
             new->Length = 0;
 
             while(new->Length + i < window_end)
@@ -118,8 +121,16 @@ LzLinkedlist EncodeLZ77(const void* _src, const size_t _size)
 
         // Treat out of boundary issue 
         window_end += inc;
-        if(window_end >= window_count)
+        if(temp == 1)
+        {
+            window_start += inc;
+        }
+        else if(window_end >= window_count) // TODO: can be optimized
+        {
             window_start += window_end - window_count;
+            temp = 1;
+        }
+            
 
         view_start += inc;
         view_end += inc;
@@ -131,13 +142,13 @@ LzLinkedlist EncodeLZ77(const void* _src, const size_t _size)
     // pull single slot
     linked_list.Head = linked_list.Head->Next;
     current->Next = NULL;
-    free((void*)buffer);
+    //free((void*)buffer);
     linked_list.SizeInByte = _size;
 
     return linked_list;
 }
 
-uint8_t* DecodeLZ77(LzLinkedlist _linked_list)
+uint8_t* DecodeFreeLZ77(LzLinkedlist _linked_list)
 {
     LzNode* node = _linked_list.Head;
     uint8_t* result = (uint8_t*)malloc(_linked_list.SizeInByte +1);
@@ -172,4 +183,22 @@ void FreeLZ77(LzLinkedlist _linked_list)
         free(node);
         node = next;
     }
+}
+
+int SaveFreeLZ77(LzLinkedlist _linked_list, const char* _str)
+{
+    FILE* out = fopen(_str, "w");
+    
+    LzNode* node = _linked_list.Head;
+    while(node)
+    {
+        LzNode* next = node->Next;
+        fwrite (next , sizeof(LzNode), 1, out);
+
+        free(node);
+        node = next;
+    }
+    fclose(out);
+    
+    return 1;
 }
