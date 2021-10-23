@@ -31,8 +31,8 @@ LzLinkedlist EncodeLZ77(const void* _src, const size_t _size)
 
     uint8_t* byte_src = (uint8_t*)_src;
 
-    const size_t window_count = 0x200;
-    const size_t view_count   = 0x200;
+    const size_t window_count = 0x80000000;
+    const size_t view_count   = 0x80000000;
     //const size_t window_count = 0x06;
     //const size_t view_count   = 0x04;
     const size_t extra_count  = LZMIN(window_count, view_count);
