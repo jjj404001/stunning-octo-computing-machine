@@ -1,4 +1,5 @@
 #include "lz77.h"
+#include "heap.h"
 
 int print_and_free_test(void* _buff, size_t _type_size, size_t _buff_count)
 {
@@ -142,6 +143,7 @@ int main(void)
     fflush(stdout);
 
     FILE* file = fopen("MetalRoughSpheres.glb", "rb");
+    //FILE* file = fopen("AtTheMountainOfMadness.txt", "rb");
     fseek(file, 0L, SEEK_END);
     uint64_t file_size = ftell(file);
     rewind(file);
@@ -151,9 +153,21 @@ int main(void)
     if (read != file_size) 
         return -1;
 
-    print_and_free_test(file_buff, sizeof(uint8_t), file_size);
-    //LzLinkedlist linked_list = EncodeLZ77(file_buff, file_size);
-    //SaveFreeLZ77(linked_list, "encodedMR.lz77");
+    //compare_and_free_test(file_buff, sizeof(uint8_t), file_size);
+    //print_and_free_test(file_buff, sizeof(uint8_t), file_size);
+    LzLinkedlist linked_list = EncodeLZ77(file_buff, file_size);
+   // SaveFreeLZ77(linked_list, "EncodedA.lz77");
+    // Decoded
+    
+    {
+        uint8_t* decoded = DecodeFreeLZ77(linked_list);
+        FILE* decoded_out = fopen("Encoded.glb", "wb");
+        fwrite (file_buff , 1, file_size, decoded_out);
+        fclose(decoded_out);
+        free(decoded);
+    }
+    
+    
 
 
     free(file_buff);
