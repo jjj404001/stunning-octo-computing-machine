@@ -49,8 +49,23 @@ void UpHeapByte(Heap* _heap, uint64_t _index)
     while(_index > 1 && Data[_index/2] < Data[_index]) 
     {
         // Swap if it is not a root node, and parent is smaller than its child node.
-
+        HeapSwap(_heap, _index/2, _index);
 
         _index /= 2;
     }
+}
+
+void HeapDelete(Heap* _heap)
+{
+    // Heap is also priority queue,
+    // binary tree is just one way to implement the heap.
+    if(_heap->Size == 0)
+        return;
+
+    HeapSwap(_heap, 1, _heap->Size-1);
+
+    void* data = ((uint8_t*)_heap->Data + (_heap->ElementSize * (_heap->Size -1)));
+    memset(data, 0, _heap->ElementSize);
+
+    //
 }
