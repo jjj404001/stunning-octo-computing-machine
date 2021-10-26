@@ -68,4 +68,6 @@ void HeapDelete(Heap* _heap)
     memset(data, 0, _heap->ElementSize);
 
     //
+
+    _heap->Size -= 1;
 }
