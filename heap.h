@@ -3,6 +3,10 @@
 #include <string.h>
 #include <stdio.h>
 
+#define HEAPPARENT(x) (((x) - 1) / 2)
+#define HEAPLEFT(x) ((2 * (x)) + 1)
+#define HEAPRIGHT(x) ((2 * (x)) + 2)
+
 typedef struct _heap
 {
     uint64_t Size;
