@@ -59,7 +59,7 @@ void UpHeapByte(Heap* _heap, uint64_t _index)
     }
 }
 
-void HeapDelete(Heap* _heap)
+void HeapDeleteByte(Heap* _heap)
 {
     // Heap is also priority queue,
     // binary tree is just one way to implement the heap.
@@ -71,7 +71,13 @@ void HeapDelete(Heap* _heap)
     void* data = ((uint8_t*)_heap->Data + (_heap->ElementSize * (_heap->Size -1)));
     memset(data, 0, _heap->ElementSize);
 
+    void* data_to_move = NULL;
     //
-
+    // If both child is not null,
+    // If both child are same or bigger than its parent
+    //      // handle cased...
+    // 
+    // If right child is ..
+    // If left child is ..
     _heap->Size -= 1;
 }
