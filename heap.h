@@ -70,15 +70,25 @@ void HeapDeleteByte(Heap* _heap, uint64_t _index)
     _heap->Size -= 1;
 
     // Down heap
+    uint64_t left_i  = HEAPLEFT(_index);
+    uint64_t right_i = HEAPRIGHT(_index);
 
+    void* left  = ((uint8_t*)_heap->Data + (_heap->ElementSize * left_i));
+    void* right = ((uint8_t*)_heap->Data + (_heap->ElementSize * right_i));
 
-
-    //
-    // If both child is not null,
-    // If both child are same or bigger than its parent
-    //      // handle cased...
-    // 
-    // If right child is ..
-    // If left child is ..
+    void* curr  = ((uint8_t*)_heap->Data + _heap->ElementSize);
+    // How to compare nodes?
     
+    if(*(uint64_t*)left < *(uint64_t*)curr) // skip if same
+    {
+        //
+    }
+    else if (*(uint64_t*)right < *(uint64_t*)curr)
+    {
+        //
+    }
+    else
+    {
+        // ? not sure about this one.
+    }
 }
