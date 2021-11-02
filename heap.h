@@ -72,23 +72,33 @@ void HeapDeleteByte(Heap* _heap, uint64_t _index)
     // Down heap
     uint64_t left_i  = HEAPLEFT(_index);
     uint64_t right_i = HEAPRIGHT(_index);
+    uint64_t curr_i  = 1;
 
     void* left  = ((uint8_t*)_heap->Data + (_heap->ElementSize * left_i));
     void* right = ((uint8_t*)_heap->Data + (_heap->ElementSize * right_i));
 
     void* curr  = ((uint8_t*)_heap->Data + _heap->ElementSize);
-    // How to compare nodes?
     
-    if(*(uint64_t*)left < *(uint64_t*)curr) // skip if same
+    
+    while(curr_i < _heap->Size)
     {
-        //
+        uint64_t left_i  = HEAPLEFT(curr_i);
+        uint64_t right_i = HEAPRIGHT(curr_i);
+
+        if(*(uint64_t*)left < *(uint64_t*)curr) // skip if same
+        {
+            HeapSwap(_heap, left_i, curr_i);
+            curr_i = left_i;
+        }
+        else if (*(uint64_t*)right < *(uint64_t*)curr)
+        {
+            HeapSwap(_heap, right_i, curr_i);
+            curr_i = right_i;
+        }
+        else
+        {
+            break;
+        }
     }
-    else if (*(uint64_t*)right < *(uint64_t*)curr)
-    {
-        //
-    }
-    else
-    {
-        // ? not sure about this one.
-    }
+    
 }
