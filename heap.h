@@ -15,6 +15,13 @@ typedef struct _heap
     size_t ElementSize;
 } Heap; 
 
+void HeapInit(Heap* _heap, uint64_t _maxSize, size_t _elementSize)
+{
+    _heap->MaxSize = _maxSize;
+    _heap->ElementSize = _elementSize;
+    _heap->Data = malloc(_elementSize * _maxSize);
+}
+
 void UpHeapByte(Heap* _heap, uint64_t _index);
 
 void HeapSwap(Heap* _heap, uint64_t _index0, uint64_t _index1)
@@ -33,7 +40,8 @@ void HeapInsertByte(Heap* _heap, uint8_t _new)
 {
     if(_heap->Size >= _heap->MaxSize)
     {
-        // grow size
+        // grow size or just stop here
+        // stop here for now
     }
 
     uint8_t* Data = (uint8_t*)_heap->Data;
