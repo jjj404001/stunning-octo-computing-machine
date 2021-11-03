@@ -17,6 +17,7 @@ typedef struct _heap
 
 void HeapInit(Heap* _heap, uint64_t _maxSize, size_t _elementSize)
 {
+    memset(_heap, 0, sizeof(Heap));
     _heap->MaxSize = _maxSize;
     _heap->ElementSize = _elementSize;
     _heap->Data = malloc(_elementSize * _maxSize);
