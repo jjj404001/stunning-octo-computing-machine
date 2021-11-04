@@ -180,7 +180,7 @@ int main(void)
     HeapInsertByte(&heap, 6);
     HeapInsertByte(&heap, 7);
     HeapInsertByte(&heap, 8);
-
+    HeapDelete(&heap);
 
     return 0;
 }

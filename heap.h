@@ -3,6 +3,8 @@
 #include <string.h>
 #include <stdio.h>
 
+
+
 #define HEAPPARENT(x) (((x) - 1) / 2)
 #define HEAPLEFT(x) ((2 * (x)) + 1)
 #define HEAPRIGHT(x) ((2 * (x)) + 2)
@@ -24,6 +26,12 @@ void HeapInit(Heap* _heap, uint64_t _maxSize, size_t _elementSize)
     //_heap->Size = 1; // Start from 1 since the index start from 1.
 
     memset(_heap->Data, 0, _elementSize * _maxSize);
+}
+
+void HeapDelete(Heap* _heap)
+{
+    // Not sure if we really need this one, but for better...code quality.
+    free(_heap->Data);
 }
 
 void UpHeapByte(Heap* _heap, uint64_t _index);
