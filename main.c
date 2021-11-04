@@ -167,11 +167,20 @@ int main(void)
         free(decoded);
     }
     */
-    
-
-
     free(file_buff);
     fclose(file);
+
+    Heap heap;
+    HeapInit(&heap, 20, 1);
+    HeapInsertByte(&heap, 1);
+    HeapInsertByte(&heap, 5);
+    HeapInsertByte(&heap, 3);
+    HeapInsertByte(&heap, 4);
+    HeapInsertByte(&heap, 2);
+    HeapInsertByte(&heap, 6);
+    HeapInsertByte(&heap, 7);
+    HeapInsertByte(&heap, 8);
+
 
     return 0;
 }
