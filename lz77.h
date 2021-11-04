@@ -1,3 +1,6 @@
+#ifndef _LZ77_H
+#define _LZ77_H
+
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
@@ -24,3 +27,4 @@ LzLinkedlist EncodeLZ77(const void* _src, const size_t _size);
 uint8_t* DecodeFreeLZ77(LzLinkedlist _linked_list);
 void FreeLZ77(LzLinkedlist _linked_list);
 int SaveFreeLZ77(LzLinkedlist _linked_list, const char* _str);
+#endif

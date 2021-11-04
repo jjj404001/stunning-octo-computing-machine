@@ -1,3 +1,6 @@
+#ifndef _HEAP_H
+#define _HEAP_H
+
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
@@ -118,3 +121,4 @@ void HeapDeleteByte(Heap* _heap, uint64_t _index)
     }
     
 }
+#endif
