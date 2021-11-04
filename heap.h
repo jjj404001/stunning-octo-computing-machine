@@ -21,7 +21,7 @@ void HeapInit(Heap* _heap, uint64_t _maxSize, size_t _elementSize)
     _heap->MaxSize = _maxSize;
     _heap->ElementSize = _elementSize;
     _heap->Data = malloc(_elementSize * _maxSize);
-    _heap->Size = 1; // Start from 1 since the index start from 1.
+    //_heap->Size = 1; // Start from 1 since the index start from 1.
 
     memset(_heap->Data, 0, _elementSize * _maxSize);
 }
@@ -58,7 +58,7 @@ void UpHeapByte(Heap* _heap, uint64_t _index)
     uint8_t* Data = (uint8_t*)_heap->Data;
 
 
-    while(_index > 1 && Data[_index/2] < Data[_index]) 
+    while(_index > 1 && Data[_index/2] > Data[_index]) 
     {
         // Swap if it is not a root node, and parent is smaller than its child node.
         HeapSwap(_heap, _index/2, _index);
@@ -93,12 +93,12 @@ void HeapDeleteByte(Heap* _heap, uint64_t _index)
         uint64_t left_i  = HEAPLEFT(curr_i);
         uint64_t right_i = HEAPRIGHT(curr_i);
 
-        if(*(uint64_t*)left < *(uint64_t*)curr) // skip if same
+        if(*(uint64_t*)left > *(uint64_t*)curr) // skip if same
         {
             HeapSwap(_heap, left_i, curr_i);
             curr_i = left_i;
         }
-        else if (*(uint64_t*)right < *(uint64_t*)curr)
+        else if (*(uint64_t*)right > *(uint64_t*)curr)
         {
             HeapSwap(_heap, right_i, curr_i);
             curr_i = right_i;
