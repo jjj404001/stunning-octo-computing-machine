@@ -1,0 +1,9 @@
+#ifndef _HUFFMAN_FORMAT_H
+#define _HUFFMAN_FORMAT_H
+
+#define BTYPE_NOCOMP 0b00
+#define BTYPE_FIXED 0b01
+#define BTYPE_DYNAMIC 0b10
+#define BTYPE_ERROR 0b11
+
+#endif
