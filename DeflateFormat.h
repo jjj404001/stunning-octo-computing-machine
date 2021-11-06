@@ -1,5 +1,5 @@
-#ifndef _HUFFMAN_FORMAT_H
-#define _HUFFMAN_FORMAT_H
+#ifndef _DEFLATE_FORMAT_H
+#define _DEFLATE_FORMAT_H
 
 #define BTYPE_NOCOMP 0b00
 #define BTYPE_FIXED 0b01
