@@ -20,6 +20,7 @@ typedef struct _lznode
 typedef struct _lzLinkedList
 {
     uint64_t SizeInByte;
+    uint64_t NodeCount;
     LzNode* Head;
 } LzLinkedlist;
 

@@ -32,7 +32,8 @@ LzLinkedlist EncodeLZ77(const void* _src, const size_t _size)
     
     uint64_t total_size = 0;
 
-
+    linked_list.SizeInByte = 0;
+    linked_list.NodeCount  = 0;
     linked_list.Head = (LzNode*)malloc(sizeof(LzNode));
 
     LzNode* current = linked_list.Head;
@@ -64,6 +65,8 @@ LzLinkedlist EncodeLZ77(const void* _src, const size_t _size)
             new->Length   = 0;
             new->Distance = 0;
             new->Literal  = view[view_start];
+            ++linked_list.NodeCount;
+
 
             current->Next = new; 
             current = new;
@@ -73,7 +76,8 @@ LzLinkedlist EncodeLZ77(const void* _src, const size_t _size)
             LzNode* new = (LzNode*)malloc(sizeof(LzNode));
             new->Distance = p - i; // i > p??
             new->Length = 0;
-
+            ++linked_list.NodeCount;
+            
             while(new->Length + i < window_end)
             {
                 ++new->Length;
