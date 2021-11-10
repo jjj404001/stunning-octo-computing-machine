@@ -9,7 +9,7 @@ int main()
     fputs("#include <stdint.h>\n\0", fout);
     fputc('\n', fout);
 
-    fputs("const uint16_t FixedHuffmanCode[] = { \0", fout);
+    fputs("const uint16_t FixedHuffmanCodeDeflate[] = { \0", fout);
 
     uint16_t huffman = 0b00110000;    
 
@@ -100,6 +100,110 @@ int main()
     fputc('\n', fout);
 
     fputs("};\n\0", fout);
+    fputs("\n", fout);
+
+    fputs("const uint16_t FixedHuffmanCodeInflate[] = { \0", fout);
+    huffman = 256;
+    for(i = 0b0000000; i < 0b0010111; i++)
+    {
+        uint16_t mask = 0b10000000;
+        fputs("0b\0", fout);
+        while(mask)
+        {
+            if(huffman & mask)
+                fputs("1\0", fout);
+            else
+                fputs("0\0", fout);
+
+            mask = mask >> 1;
+        }
+        fputs(", \0", fout);
+
+        ++huffman;
+    }
+    fputc('\n', fout);
+
+    // Empty from 
+    // 24~47
+    for(i = 24; i < 48; i++)
+    {
+        fputs("0xFFFF, \0", fout);
+    }
+    fputc('\n', fout);
+
+    huffman = 0;
+    for(i = 0; i < 144; i++)
+    {
+        uint16_t mask = 0b10000000;
+        fputs("0b\0", fout);
+        while(mask)
+        {
+            if(huffman & mask)
+                fputs("1\0", fout);
+            else
+                fputs("0\0", fout);
+
+            mask = mask >> 1;
+        }
+        fputs(", \0", fout);
+
+        ++huffman;
+    }
+    fputc('\n', fout);
+
+    // No empty chunk.
+
+    huffman = 280;
+    for(i = 0; i < 18; i++)
+    {
+        uint16_t mask = 0b10000000;
+        fputs("0b\0", fout);
+        while(mask)
+        {
+            if(huffman & mask)
+                fputs("1\0", fout);
+            else
+                fputs("0\0", fout);
+
+            mask = mask >> 1;
+        }
+        fputs(", \0", fout);
+
+        ++huffman;
+    }
+    fputc('\n', fout);
+    // Empty from 
+    // 200~399
+    for(i = 200; i < 400; i++)
+    {
+        fputs("0xFFFF, \0", fout);
+    }
+    fputc('\n', fout);
+
+    huffman = 144;
+    for(i = 0; i < 112; i++)
+    {
+        uint16_t mask = 0b10000000;
+        fputs("0b\0", fout);
+        while(mask)
+        {
+            if(huffman & mask)
+                fputs("1\0", fout);
+            else
+                fputs("0\0", fout);
+
+            mask = mask >> 1;
+        }
+        fputs(", \0", fout);
+
+        ++huffman;
+    }
+    fputc('\n', fout);
+
+    fputs("};\n\0", fout);
+    fputs("\n", fout);
+
+    
     fputs("#endif\n\0", fout);
     fclose(fout);
     return 0;
