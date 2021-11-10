@@ -104,9 +104,9 @@ int main()
 
     fputs("const uint16_t FixedHuffmanCodeInflate[] = { \0", fout);
     huffman = 256;
-    for(i = 0b0000000; i < 0b0010111; i++)
+    for(i = 0; i < 24; i++)
     {
-        uint16_t mask = 0b10000000;
+        uint16_t mask = 0b100000000;
         fputs("0b\0", fout);
         while(mask)
         {
@@ -134,7 +134,7 @@ int main()
     huffman = 0;
     for(i = 0; i < 144; i++)
     {
-        uint16_t mask = 0b10000000;
+        uint16_t mask = 0b100000000;
         fputs("0b\0", fout);
         while(mask)
         {
@@ -154,9 +154,9 @@ int main()
     // No empty chunk.
 
     huffman = 280;
-    for(i = 0; i < 18; i++)
+    for(i = 0; i < 8; i++)
     {
-        uint16_t mask = 0b10000000;
+        uint16_t mask = 0b100000000;
         fputs("0b\0", fout);
         while(mask)
         {
@@ -183,7 +183,7 @@ int main()
     huffman = 144;
     for(i = 0; i < 112; i++)
     {
-        uint16_t mask = 0b10000000;
+        uint16_t mask = 0b100000000;
         fputs("0b\0", fout);
         while(mask)
         {
