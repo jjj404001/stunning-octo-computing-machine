@@ -1,5 +1,6 @@
 #include "lz77.h"
 #include "heap.h"
+#include "Deflate.h"
 
 int print_and_free_test(void* _buff, size_t _type_size, size_t _buff_count)
 {
