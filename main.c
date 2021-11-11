@@ -143,8 +143,8 @@ int main(void)
 
     fflush(stdout);
 
-    FILE* file = fopen("MetalRoughSpheres.glb", "rb");
-    //FILE* file = fopen("AtTheMountainOfMadness.txt", "rb");
+    //FILE* file = fopen("MetalRoughSpheres.glb", "rb");
+    FILE* file = fopen("AtTheMountainOfMadness.txt", "rb");
     fseek(file, 0L, SEEK_END);
     uint64_t file_size = ftell(file);
     rewind(file);
@@ -168,9 +168,13 @@ int main(void)
         free(decoded);
     }
     */
+    LzLinkedlist linked_list = EncodeLZ77(file_buff, file_size);
+    Deflate("DeflateTest", &linked_list);
+
+    
     free(file_buff);
     fclose(file);
-
+    /*
     Heap heap;
     HeapInit(&heap, 20, 1);
     HeapInsertByte(&heap, 1);
@@ -182,6 +186,6 @@ int main(void)
     HeapInsertByte(&heap, 7);
     HeapInsertByte(&heap, 8);
     HeapDelete(&heap);
-
+    */
     return 0;
 }
