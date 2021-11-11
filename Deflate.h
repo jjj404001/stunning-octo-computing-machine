@@ -22,11 +22,13 @@ void Deflate(const char* _out_path, LzLinkedlist* _lz)
             // Put block header
         }
 
+        uint16_t huff = 0;
+        uint8_t  huff_bit_count = 0;
         if(node->Length == 0)
         {
             // Put raw byte
-            uint16_t huff = FixedHuffmanCodeDeflate[node->Literal];
-            uint8_t  huff_bit_count = 0;
+            huff = FixedHuffmanCodeDeflate[node->Literal];
+            
 
             // Should be single byte since the length is 0
             /*if (node->Literal >= 280)
@@ -39,19 +41,31 @@ void Deflate(const char* _out_path, LzLinkedlist* _lz)
             else if (node->Literal >= 0)
                 huff_bit_count = 8;
 
-            uint16_t mask = 1 << huff_bit_count;
+            
+            uint8_t remaining_bits = 8 - ostream.BitUsed;
+            uint8_t mask = 0;
+            mask = ~mask;
+            mask &= ((1 << (remaining_bits +1)) -1);
 
-            while(mask != 0)
-            {
-                ostream.Data |= (mask & huff) >> ostream.BitUsed++;
-                mask = mask >> 1;
-            }
+            ostream.Data |= (huff >> ostream.BitUsed) | ~mask;
+            ostream.BitUsed += huff_bit_count;
         }
 
+        if(ostream.BitUsed >= 8)
+        {
+            uint8_t num  = ostream.BitUsed - 8;
+            ostream.BitUsed = num;
+            huff = huff << (8 - num);
+            num = 8 - num;
+            uint16_t mask = ~((1 << (num +1)) -1); 
+            huff &= mask;
 
+            ostream.Data = huff & 0xFF;
 
-        if(ostream.BitUsed >= 8) 
-            fwrite (&ostream.Data , 1, 1, deflate_out);
+            fwrite(&ostream.Data, 1, 1, deflate_out);
+        }
+
+        node = node->Next;   
     }
 
     fclose(deflate_out);
