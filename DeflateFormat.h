@@ -8,8 +8,8 @@
 #define BTYPE_DYNAMIC 0b10
 #define BTYPE_ERROR 0b11
 
-#define BIT_1(src, mask) (src) | (mask)
-#define BIT_0(src, mask) (src) & ^(mask)
+#define BIT_MASK_8 0b11111111
+#define BIT_MASK_9 0b0000000111111111
 
 #define FIXED_END_OF_DATA 0b0000000
 #define COMP_END_OF_DATA 0b100000000 // 256
