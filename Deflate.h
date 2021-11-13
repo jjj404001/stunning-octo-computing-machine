@@ -41,28 +41,23 @@ void Deflate(const char* _out_path, LzLinkedlist* _lz)
             else if (node->Literal >= 0)
                 huff_bit_count = 8;
 
-            
             uint8_t remaining_bits = 8 - ostream.BitUsed;
-            uint8_t mask = 0;
-            mask = ~mask;
-            mask &= ((1 << (remaining_bits +1)) -1);
-
-            ostream.Data |= (huff >> ostream.BitUsed) | ~mask;
+            uint8_t shifted = 0xFF & (huff >> (ostream.BitUsed + (huff_bit_count -8))); // shift "BitUsed" amount, +1 if it is 9bits.
+            ostream.Data    |= shifted;
             ostream.BitUsed += huff_bit_count;
         }
 
         if(ostream.BitUsed >= 8)
         {
-            uint8_t num  = ostream.BitUsed - 8;
-            ostream.BitUsed = num;
-            huff = huff << (8 - num);
-            num = 8 - num;
-            uint16_t mask = ~((1 << (num +1)) -1); 
-            huff &= mask;
-
-            ostream.Data = huff & 0xFF;
-
             fwrite(&ostream.Data, 1, 1, deflate_out);
+
+            uint8_t num = ostream.BitUsed - 8;
+            ostream.BitUsed = num;
+
+            uint8_t shifted = huff & ((1 << (ostream.BitUsed +1)) -1);
+            shifted = shifted << (8 - num);
+            
+            ostream.Data = shifted;
         }
 
         node = node->Next;   
