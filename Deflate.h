@@ -6,6 +6,13 @@
 #include "DeflateFormat.h"
 #include "FixedHuffman.h"
 
+void WriteDeflateTypeBits(uint8_t* _type, uint8_t* _data, uint8_t* _bit_used)
+{
+    // Put type bit
+    *_data     |= BTYPE_FIXED >> (8 - *_bit_used);
+    *_bit_used += 2;
+}
+
 void Deflate(const char* _out_path, LzLinkedlist* _lz)
 {
     FILE* deflate_out = fopen(_out_path, "wb");
@@ -26,9 +33,7 @@ void Deflate(const char* _out_path, LzLinkedlist* _lz)
         uint8_t  huff_bit_count = 0;
         if(node->Length == 0)
         {
-            // Put type bit
-            ostream.Data    |= BTYPE_FIXED >> (8 - ostream.BitUsed);
-            ostream.BitUsed += 2;
+
 
             // Put raw byte
             huff = FixedHuffmanCodeDeflate[node->Literal];
