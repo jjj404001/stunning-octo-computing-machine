@@ -26,6 +26,10 @@ void Deflate(const char* _out_path, LzLinkedlist* _lz)
         uint8_t  huff_bit_count = 0;
         if(node->Length == 0)
         {
+            // Put type bit
+            ostream.Data    |= BTYPE_FIXED >> (8 - ostream.BitUsed);
+            ostream.BitUsed += 2;
+
             // Put raw byte
             huff = FixedHuffmanCodeDeflate[node->Literal];
             
@@ -45,6 +49,10 @@ void Deflate(const char* _out_path, LzLinkedlist* _lz)
             uint8_t shifted = 0xFF & (huff >> (ostream.BitUsed + (huff_bit_count -8))); // shift "BitUsed" amount, +1 if it is 9bits.
             ostream.Data    |= shifted;
             ostream.BitUsed += huff_bit_count;
+        }
+        else
+        {
+            // Compressed
         }
 
         if(ostream.BitUsed >= 8)
