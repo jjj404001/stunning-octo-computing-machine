@@ -14,6 +14,10 @@
 #define FIXED_END_OF_DATA 0b0000000
 #define COMP_END_OF_DATA 0b100000000 // 256
 
+#define HUFF_LIT 0b11111
+#define HUFF_DIST 0b11111
+#define HUFF_CLEN 0b1111
+
 typedef struct _deflate_out_stream
 {
     uint8_t BitMask;
