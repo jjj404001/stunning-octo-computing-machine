@@ -33,7 +33,7 @@ void Deflate(const char* _out_path, LzLinkedlist* _lz)
         uint8_t  huff_bit_count = 0;
         if(node->Length == 0)
         {
-
+            WriteDeflateTypeBits(BTYPE_FIXED, ostream.Data, &ostream.BitUsed);
 
             // Put raw byte
             huff = FixedHuffmanCodeDeflate[node->Literal];
