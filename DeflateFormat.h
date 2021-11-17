@@ -18,6 +18,8 @@
 #define HUFF_DIST 0b11111
 #define HUFF_CLEN 0b1111
 
+#define HUFF_MAX_COUNT 0xFF
+
 typedef struct _deflate_out_stream
 {
     uint8_t BitMask;
