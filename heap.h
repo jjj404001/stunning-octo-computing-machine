@@ -38,14 +38,11 @@ void HeapReset(Heap* _heap)
     memset(_heap->Data, 0, _heap->ElementSize * _heap->MaxSize);
 }
 
-
 void HeapDelete(Heap* _heap)
 {
     // Not sure if we really need this one, but for better...code quality.
     free(_heap->Data);
 }
-
-void UpHeapByte(Heap* _heap, uint64_t _index);
 
 void HeapSwap(Heap* _heap, uint64_t _index0, uint64_t _index1)
 {
@@ -57,19 +54,6 @@ void HeapSwap(Heap* _heap, uint64_t _index0, uint64_t _index1)
 
     memcpy(data0, data1, _heap->ElementSize);
     memcpy(data1, temp, _heap->ElementSize);
-}
-
-void HeapInsertByte(Heap* _heap, uint8_t _new)
-{
-    if(_heap->Size >= _heap->MaxSize)
-    {
-        // grow size or just stop here
-        // stop here for now
-    }
-
-    uint8_t* Data = (uint8_t*)_heap->Data;
-    Data[++_heap->Size] = _new;
-    UpHeapByte(_heap, _heap->Size);
 }
 
 void UpHeapByte(Heap* _heap, uint64_t _index)
@@ -84,6 +68,19 @@ void UpHeapByte(Heap* _heap, uint64_t _index)
 
         _index /= 2;
     }
+}
+
+void HeapInsertByte(Heap* _heap, uint8_t _new)
+{
+    if(_heap->Size >= _heap->MaxSize)
+    {
+        // grow size or just stop here
+        // stop here for now
+    }
+
+    uint8_t* Data = (uint8_t*)_heap->Data;
+    Data[++_heap->Size] = _new;
+    UpHeapByte(_heap, _heap->Size);
 }
 
 void HeapDeleteByte(Heap* _heap, uint64_t _index)
