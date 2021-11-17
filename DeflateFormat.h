@@ -18,7 +18,7 @@
 #define HUFF_DIST 0b11111
 #define HUFF_CLEN 0b1111
 
-#define HUFF_MAX_COUNT 0xFF
+#define HUFF_MAX_BIT_LENGTH 19
 
 typedef struct _deflate_out_stream
 {
