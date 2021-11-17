@@ -16,6 +16,7 @@ typedef struct _heap
 {
     uint64_t Size;
     uint64_t MaxSize;
+    uint64_t Height;
     void* Data;
     size_t ElementSize;
 } Heap; 
@@ -30,6 +31,13 @@ void HeapInit(Heap* _heap, uint64_t _maxSize, size_t _elementSize)
 
     memset(_heap->Data, 0, _elementSize * _maxSize);
 }
+
+void HeapReset(Heap* _heap)
+{
+    _heap->Height = 0;
+    memset(_heap->Data, 0, _heap->ElementSize * _heap->MaxSize);
+}
+
 
 void HeapDelete(Heap* _heap)
 {
