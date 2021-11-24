@@ -26,7 +26,7 @@ typedef struct _lcounter
 
 typedef struct _lzLinkedList
 {
-    LCounter LiteralFreqCounter[255];
+    //LCounter LiteralFreqCounter[255];
     uint8_t DFreqCounter[MAX_D];
 
     uint64_t SizeInByte;
