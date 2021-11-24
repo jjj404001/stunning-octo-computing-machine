@@ -19,14 +19,8 @@ typedef struct _lznode
     struct _lznode* Next;
 } LzNode;
 
-typedef struct _lcounter
-{
-    uint16_t LengthFreqCounter[0x8000];
-} LCounter;
-
 typedef struct _lzLinkedList
 {
-    //LCounter LiteralFreqCounter[255];
     uint8_t DFreqCounter[MAX_D];
 
     uint64_t SizeInByte;
