@@ -156,20 +156,20 @@ int main(void)
 
     //compare_and_free_test(file_buff, sizeof(uint8_t), file_size);
     //print_and_free_test(file_buff, sizeof(uint8_t), file_size);
-    //LzLinkedlist linked_list = EncodeLZ77(file_buff, file_size);
-   // SaveFreeLZ77(linked_list, "EncodedA.lz77");
+    LzLinkedlist linked_list = EncodeLZ77(file_buff, file_size);
+    //SaveFreeLZ77(linked_list, "EncodedA.lz77");
     // Decoded
-    /*
+    
     {
         uint8_t* decoded = DecodeFreeLZ77(linked_list);
-        FILE* decoded_out = fopen("Encoded.glb", "wb");
+        FILE* decoded_out = fopen("Decoded.lz77", "wb");
         fwrite (file_buff , 1, file_size, decoded_out);
         fclose(decoded_out);
         free(decoded);
     }
-    */
-    LzLinkedlist linked_list = EncodeLZ77(file_buff, file_size);
-    Deflate("DeflateTest", &linked_list);
+    
+    //LzLinkedlist linked_list = EncodeLZ77(file_buff, file_size);
+    //Deflate("DeflateTest", &linked_list);
 
     
     free(file_buff);
