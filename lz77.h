@@ -12,9 +12,9 @@
 
 typedef struct _lznode
 {
-    uint64_t Length;
+    uint16_t Length;
     uint8_t  Literal; // Byte size literal
-    uint64_t Distance;
+    uint16_t Distance;
 
     struct _lznode* Next;
 } LzNode;
