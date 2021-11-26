@@ -168,6 +168,23 @@ void FreeLZ77(LzLinkedlist _linked_list)
     }
 }
 
+int SaveLZ77(LzLinkedlist _linked_list, const char* _str)
+{
+    FILE* out = fopen(_str, "w");
+    
+    LzNode* node = _linked_list.Head;
+    while(node)
+    {
+        LzNode* next = node->Next;
+        fwrite (next , sizeof(LzNode), 1, out);
+
+        node = next;
+    }
+    fclose(out);
+    
+    return 1;
+}
+
 int SaveFreeLZ77(LzLinkedlist _linked_list, const char* _str)
 {
     FILE* out = fopen(_str, "w");
