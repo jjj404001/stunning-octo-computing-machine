@@ -21,8 +21,6 @@ typedef struct _lznode
 
 typedef struct _lzLinkedList
 {
-    uint8_t DFreqCounter[MAX_D];
-
     uint64_t SizeInByte;
     uint64_t NodeCount;
     LzNode* Head;
