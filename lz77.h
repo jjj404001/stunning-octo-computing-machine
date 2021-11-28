@@ -32,5 +32,6 @@ typedef struct _lzLinkedList
 LzLinkedlist EncodeLZ77(const void* _src, const size_t _size);
 uint8_t* DecodeFreeLZ77(LzLinkedlist _linked_list);
 void FreeLZ77(LzLinkedlist _linked_list);
+int SaveLZ77(LzLinkedlist _linked_list, const char* _str);
 int SaveFreeLZ77(LzLinkedlist _linked_list, const char* _str);
 #endif
