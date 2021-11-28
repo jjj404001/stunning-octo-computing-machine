@@ -153,6 +153,12 @@ uint8_t* DecodeFreeLZ77(LzLinkedlist _linked_list)
         node = next;
     }
 
+    if(_linked_list.DCounter)
+        free(_linked_list.DCounter);
+        
+    if(_linked_list.LCounter)
+        free(_linked_list.LCounter);
+
     return result;
 }
 
@@ -166,6 +172,12 @@ void FreeLZ77(LzLinkedlist _linked_list)
         free(node);
         node = next;
     }
+
+    if(_linked_list.DCounter)
+        free(_linked_list.DCounter);
+
+    if(_linked_list.LCounter)
+        free(_linked_list.LCounter);
 }
 
 int SaveLZ77(LzLinkedlist _linked_list, const char* _str)
@@ -199,6 +211,12 @@ int SaveFreeLZ77(LzLinkedlist _linked_list, const char* _str)
         node = next;
     }
     fclose(out);
+
+    if(_linked_list.DCounter)
+        free(_linked_list.DCounter);
+        
+    if(_linked_list.LCounter)
+        free(_linked_list.LCounter);
     
     return 1;
 }
