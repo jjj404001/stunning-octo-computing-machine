@@ -21,6 +21,9 @@ typedef struct _lznode
 
 typedef struct _lzLinkedList
 {
+    uint16_t* DCounter;
+    uint16_t* LCounter;
+
     uint64_t SizeInByte;
     uint64_t NodeCount;
     LzNode* Head;
