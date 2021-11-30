@@ -35,6 +35,17 @@ LzLinkedlist EncodeLZ77(const void* _src, const size_t _size)
     linked_list.SizeInByte = 0;
     linked_list.NodeCount  = 0;
     linked_list.Head = (LzNode*)malloc(sizeof(LzNode));
+    linked_list.DCounter = (uint16_t*)malloc(sizeof(uint16_t) * MAX_D);
+    linked_list.LCounter = (uint16_t**)malloc(sizeof(uint16_t*) * 256);
+    
+    {
+        int i = 0;
+        for(i = 0; i < 256; i++)
+        {
+            linked_list.LCounter[i] = (uint16_t*)malloc(sizeof(uint16_t) * MAX_D);
+        }
+    }
+    // TODO : MEMSET
 
     LzNode* current = linked_list.Head;
 

@@ -22,7 +22,7 @@ typedef struct _lznode
 typedef struct _lzLinkedList
 {
     uint16_t* DCounter;
-    uint16_t* LCounter;
+    uint16_t** LCounter;
 
     uint64_t SizeInByte;
     uint64_t NodeCount;
@@ -31,6 +31,7 @@ typedef struct _lzLinkedList
 
 LzLinkedlist EncodeLZ77(const void* _src, const size_t _size);
 uint8_t* DecodeFreeLZ77(LzLinkedlist _linked_list);
+void FreeCountersLZ77(LzLinkedlist _linked_list);
 void FreeLZ77(LzLinkedlist _linked_list);
 int SaveLZ77(LzLinkedlist _linked_list, const char* _str);
 int SaveFreeLZ77(LzLinkedlist _linked_list, const char* _str);
