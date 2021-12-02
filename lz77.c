@@ -47,7 +47,7 @@ LzLinkedlist EncodeLZ77(const void* _src, const size_t _size)
             memset(&linked_list.LCounter[i], 0, sizeof(uint16_t) * MAX_D);
         }
     }
-    // TODO : MEMSET
+
 
     LzNode* current = linked_list.Head;
 
@@ -56,9 +56,6 @@ LzLinkedlist EncodeLZ77(const void* _src, const size_t _size)
     uint64_t window_start = 0;
     uint64_t window_end   = 0;
 
-    int temp = 0;
-    //memset(linked_list.DFreqCounter, 0, MAX_D);
-    //memcpy(buffer, byte_src, buffer_size); // Should I do something like min(buffer_size, _size) ? 
 
     while(total_size < _size)
     {
