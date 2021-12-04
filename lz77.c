@@ -77,6 +77,8 @@ LzLinkedlist EncodeLZ77(const void* _src, const size_t _size)
             new->Literal  = view[view_start];
             ++linked_list.NodeCount;
 
+            ++linked_list.DCounter[new->Distance];
+
             current->Next = new; 
             current = new;
         }
@@ -104,6 +106,8 @@ LzLinkedlist EncodeLZ77(const void* _src, const size_t _size)
                 new->Length  = view_count-1; 
                 new->Literal = view[new->Length + view_start];
             }
+
+            ++linked_list.DCounter[new->Distance];
 
             current->Next = new; 
             current = new;
