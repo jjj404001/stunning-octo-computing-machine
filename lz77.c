@@ -56,7 +56,7 @@ LzLinkedlist EncodeLZ77(const void* _src, const size_t _size)
     uint64_t window_start = 0;
     uint64_t window_end   = 0;
 
-
+    int bool = 0;
     while(total_size < _size)
     {
         uint64_t i = window_start;
@@ -118,14 +118,14 @@ LzLinkedlist EncodeLZ77(const void* _src, const size_t _size)
 
         // Treat out of boundary issue 
         window_end += inc;
-        if(temp == 1)
+        if(bool == 1)
         {
             window_start += inc;
         }
         else if(window_end >= window_count) // TODO: can be optimized
         {
             window_start += window_end - window_count;
-            temp = 1;
+            bool = 1;
         }
             
 
